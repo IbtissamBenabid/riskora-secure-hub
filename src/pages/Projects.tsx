@@ -12,24 +12,33 @@ import { Plus, FolderKanban, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Projects() {
-  const { projects, organizations, assessments, suppliers, currentUser, createProject } = useStore();
+  const { projects, organizations, assessments, suppliers, currentUser, createProject, createOrganization } = useStore();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [orgId, setOrgId] = useState(organizations[0]?.id ?? "");
+  const [newOrgName, setNewOrgName] = useState("");
 
-  // Clients only see their assigned projects
+  // Clients only see their assigned projects (RLS already filters, but keep UX consistent)
   const visibleProjects = currentUser?.role === "client"
-    ? projects.filter(p => currentUser.assignedProjectIds?.includes(p.id))
+    ? projects.filter(p => currentUser.assignedProjectIds?.includes(p.id) || p.organizationId === currentUser.organizationId)
     : projects;
 
   const isConsultant = currentUser?.role === "consultant";
 
-  function submit() {
+  async function submit() {
     if (!name.trim()) { toast.error("Project name required"); return; }
-    createProject({ name: name.trim(), description: description.trim(), organizationId: orgId });
+    let useOrg = orgId;
+    if (!useOrg && newOrgName.trim()) {
+      const o = await createOrganization({ name: newOrgName.trim() });
+      if (!o) return;
+      useOrg = o.id;
+    }
+    if (!useOrg) { toast.error("Please select or create a client organization"); return; }
+    const p = await createProject({ name: name.trim(), description: description.trim(), organizationId: useOrg });
+    if (!p) return;
     toast.success("Project created");
-    setName(""); setDescription(""); setOpen(false);
+    setName(""); setDescription(""); setNewOrgName(""); setOpen(false);
   }
 
   return (
@@ -54,12 +63,19 @@ export default function Projects() {
               </div>
               <div className="space-y-1.5">
                 <Label>Client organization</Label>
-                <Select value={orgId} onValueChange={setOrgId}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {organizations.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                {organizations.length > 0 ? (
+                  <Select value={orgId} onValueChange={setOrgId}>
+                    <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
+                    <SelectContent>
+                      {organizations.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input value={newOrgName} onChange={(e) => setNewOrgName(e.target.value)} placeholder="New client organization name" />
+                )}
+                {organizations.length === 0 && (
+                  <p className="text-[11px] text-muted-foreground">No organizations yet — one will be created.</p>
+                )}
               </div>
             </div>
             <DialogFooter>
