@@ -17,6 +17,7 @@ import Reports from "./pages/Reports.tsx";
 import SupplierPortal from "./pages/SupplierPortal.tsx";
 import Questionnaire from "./pages/Questionnaire.tsx";
 import { RiskAnalysis, SecurityRequirements, SecureCodeReview, SecurityTesting, Compliance } from "./pages/Modules.tsx";
+import Invites from "./pages/Invites.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/tprm" element={<ProtectedRoute allow={["consultant", "client"]}><TPRM /></ProtectedRoute>} />
             <Route path="/tprm/assessments/:id" element={<ProtectedRoute allow={["consultant", "client"]}><AssessmentDetail /></ProtectedRoute>} />
             <Route path="/reports" element={<ProtectedRoute allow={["consultant", "client"]}><Reports /></ProtectedRoute>} />
+            <Route path="/invites" element={<ProtectedRoute allow={["consultant"]}><Invites /></ProtectedRoute>} />
 
             {/* Module placeholders — consultant only */}
             <Route path="/modules/risk-analysis" element={<ProtectedRoute allow={["consultant"]}><RiskAnalysis /></ProtectedRoute>} />
