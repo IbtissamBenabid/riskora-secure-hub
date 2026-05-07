@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard, FolderKanban, ShieldCheck, FileBarChart2,
-  Activity, FileCheck2, Code2, Bug, Scale, Sparkles, UserPlus,
+  Activity, FileCheck2, Code2, Bug, Scale, UserPlus,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
@@ -16,10 +16,10 @@ const NAV_CORE = [
   { to: "/invites", label: "Invitations", icon: UserPlus, roles: ["consultant"] },
 ];
 
-const NAV_PLACEHOLDER = [
+const NAV_MODULES = [
   { to: "/modules/risk-analysis", label: "Risk Analysis", icon: Activity },
-  { to: "/modules/security-requirements", label: "Security Requirements", icon: FileCheck2 },
-  { to: "/modules/secure-code-review", label: "Secure Code Review", icon: Code2 },
+  { to: "/modules/security-requirements", label: "Requirements", icon: FileCheck2 },
+  { to: "/modules/secure-code-review", label: "Code Review", icon: Code2 },
   { to: "/modules/security-testing", label: "Security Testing", icon: Bug },
   { to: "/modules/compliance", label: "Compliance", icon: Scale },
 ];
@@ -58,13 +58,13 @@ export function AppSidebar() {
           ))}
         </ul>
 
-        {currentUser?.role === "consultant" && (
+        {(currentUser?.role === "consultant" || currentUser?.role === "client") && (
           <>
             <div className="px-2 mt-7 mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/50">
               Modules
             </div>
             <ul className="space-y-0.5">
-              {NAV_PLACEHOLDER.map(({ to, label, icon: Icon }) => (
+              {NAV_MODULES.map(({ to, label, icon: Icon }) => (
                 <li key={to}>
                   <NavLink to={to} className={({ isActive }) => cn(
                     "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition",
@@ -74,7 +74,6 @@ export function AppSidebar() {
                   )}>
                     <Icon className="h-4 w-4" />
                     <span className="flex-1">{label}</span>
-                    <Sparkles className="h-3 w-3 opacity-50" />
                   </NavLink>
                 </li>
               ))}
