@@ -65,6 +65,209 @@ export type Database = {
           },
         ]
       }
+      code_review_findings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          cwe_id: string | null
+          description: string | null
+          file_path: string | null
+          id: string
+          line_number: number | null
+          remediation: string | null
+          review_id: string
+          severity: Database["public"]["Enums"]["finding_severity"]
+          status: Database["public"]["Enums"]["finding_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          cwe_id?: string | null
+          description?: string | null
+          file_path?: string | null
+          id?: string
+          line_number?: number | null
+          remediation?: string | null
+          review_id: string
+          severity?: Database["public"]["Enums"]["finding_severity"]
+          status?: Database["public"]["Enums"]["finding_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          cwe_id?: string | null
+          description?: string | null
+          file_path?: string | null
+          id?: string
+          line_number?: number | null
+          remediation?: string | null
+          review_id?: string
+          severity?: Database["public"]["Enums"]["finding_severity"]
+          status?: Database["public"]["Enums"]["finding_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "code_review_findings_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "code_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      code_reviews: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          project_id: string
+          repository_url: string | null
+          reviewer: string | null
+          scope: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["review_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          project_id: string
+          repository_url?: string | null
+          reviewer?: string | null
+          scope?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["review_status"]
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          project_id?: string
+          repository_url?: string | null
+          reviewer?: string | null
+          scope?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["review_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "code_reviews_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_controls: {
+        Row: {
+          control_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          evidence: string | null
+          framework_id: string
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["control_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          control_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          evidence?: string | null
+          framework_id: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["control_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          control_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          evidence?: string | null
+          framework_id?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["control_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_controls_framework_id_fkey"
+            columns: ["framework_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_frameworks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_frameworks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          framework_name: string
+          id: string
+          project_id: string
+          status: Database["public"]["Enums"]["compliance_status"]
+          target_date: string | null
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          framework_name: string
+          id?: string
+          project_id: string
+          status?: Database["public"]["Enums"]["compliance_status"]
+          target_date?: string | null
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          framework_name?: string
+          id?: string
+          project_id?: string
+          status?: Database["public"]["Enums"]["compliance_status"]
+          target_date?: string | null
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_frameworks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       decisions: {
         Row: {
           assessment_id: string
@@ -213,6 +416,115 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      pentest_engagements: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          project_id: string
+          scope: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["engagement_status"]
+          tester: string | null
+          title: string
+          type: Database["public"]["Enums"]["engagement_type"]
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          project_id: string
+          scope?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["engagement_status"]
+          tester?: string | null
+          title: string
+          type?: Database["public"]["Enums"]["engagement_type"]
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          project_id?: string
+          scope?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["engagement_status"]
+          tester?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["engagement_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pentest_engagements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pentest_findings: {
+        Row: {
+          affected_asset: string | null
+          created_at: string
+          created_by: string | null
+          cvss_score: number | null
+          description: string | null
+          engagement_id: string
+          id: string
+          remediation: string | null
+          retest_status: Database["public"]["Enums"]["retest_status"] | null
+          severity: Database["public"]["Enums"]["finding_severity"]
+          status: Database["public"]["Enums"]["pentest_finding_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          affected_asset?: string | null
+          created_at?: string
+          created_by?: string | null
+          cvss_score?: number | null
+          description?: string | null
+          engagement_id: string
+          id?: string
+          remediation?: string | null
+          retest_status?: Database["public"]["Enums"]["retest_status"] | null
+          severity?: Database["public"]["Enums"]["finding_severity"]
+          status?: Database["public"]["Enums"]["pentest_finding_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          affected_asset?: string | null
+          created_at?: string
+          created_by?: string | null
+          cvss_score?: number | null
+          description?: string | null
+          engagement_id?: string
+          id?: string
+          remediation?: string | null
+          retest_status?: Database["public"]["Enums"]["retest_status"] | null
+          severity?: Database["public"]["Enums"]["finding_severity"]
+          status?: Database["public"]["Enums"]["pentest_finding_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pentest_findings_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "pentest_engagements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -368,6 +680,65 @@ export type Database = {
           },
         ]
       }
+      risk_registers: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          impact: number
+          likelihood: number
+          owner: string | null
+          project_id: string
+          risk_score: number | null
+          status: Database["public"]["Enums"]["risk_register_status"]
+          title: string
+          treatment: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          impact?: number
+          likelihood?: number
+          owner?: string | null
+          project_id: string
+          risk_score?: number | null
+          status?: Database["public"]["Enums"]["risk_register_status"]
+          title: string
+          treatment?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          impact?: number
+          likelihood?: number
+          owner?: string | null
+          project_id?: string
+          risk_score?: number | null
+          status?: Database["public"]["Enums"]["risk_register_status"]
+          title?: string
+          treatment?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_registers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       risk_scores: {
         Row: {
           assessment_id: string
@@ -396,6 +767,59 @@ export type Database = {
             columns: ["assessment_id"]
             isOneToOne: true
             referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_requirements: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          framework: string | null
+          id: string
+          priority: Database["public"]["Enums"]["requirement_priority"]
+          project_id: string
+          reference_id: string | null
+          status: Database["public"]["Enums"]["requirement_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          framework?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["requirement_priority"]
+          project_id: string
+          reference_id?: string | null
+          status?: Database["public"]["Enums"]["requirement_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          framework?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["requirement_priority"]
+          project_id?: string
+          reference_id?: string | null
+          status?: Database["public"]["Enums"]["requirement_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_requirements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -488,6 +912,10 @@ export type Database = {
         Args: { _supplier: string; _user: string }
         Returns: boolean
       }
+      user_can_access_project: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       answer_value: "yes" | "partial" | "no" | "na"
@@ -499,10 +927,22 @@ export type Database = {
         | "reviewed"
         | "approved"
         | "rejected"
+      compliance_status: "not_started" | "in_progress" | "ready" | "certified"
+      control_status: "not_implemented" | "partial" | "implemented" | "verified"
       decision_type: "accept" | "accept_with_conditions" | "reject"
+      engagement_status: "scoping" | "active" | "completed" | "reported"
+      engagement_type: "pentest" | "dast" | "red_team"
+      finding_severity: "critical" | "high" | "medium" | "low" | "info"
+      finding_status: "open" | "confirmed" | "fixed" | "false_positive"
       invite_status: "pending" | "accepted" | "revoked"
+      pentest_finding_status: "open" | "confirmed" | "remediated" | "accepted"
       project_status: "active" | "completed"
+      requirement_priority: "critical" | "high" | "medium" | "low"
+      requirement_status: "draft" | "approved" | "implemented" | "verified"
+      retest_status: "pending" | "passed" | "failed"
+      review_status: "planned" | "in_progress" | "completed"
       risk_level: "low" | "medium" | "high"
+      risk_register_status: "open" | "mitigated" | "accepted" | "transferred"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -640,10 +1080,22 @@ export const Constants = {
         "approved",
         "rejected",
       ],
+      compliance_status: ["not_started", "in_progress", "ready", "certified"],
+      control_status: ["not_implemented", "partial", "implemented", "verified"],
       decision_type: ["accept", "accept_with_conditions", "reject"],
+      engagement_status: ["scoping", "active", "completed", "reported"],
+      engagement_type: ["pentest", "dast", "red_team"],
+      finding_severity: ["critical", "high", "medium", "low", "info"],
+      finding_status: ["open", "confirmed", "fixed", "false_positive"],
       invite_status: ["pending", "accepted", "revoked"],
+      pentest_finding_status: ["open", "confirmed", "remediated", "accepted"],
       project_status: ["active", "completed"],
+      requirement_priority: ["critical", "high", "medium", "low"],
+      requirement_status: ["draft", "approved", "implemented", "verified"],
+      retest_status: ["pending", "passed", "failed"],
+      review_status: ["planned", "in_progress", "completed"],
       risk_level: ["low", "medium", "high"],
+      risk_register_status: ["open", "mitigated", "accepted", "transferred"],
     },
   },
 } as const
