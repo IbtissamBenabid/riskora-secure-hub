@@ -16,7 +16,11 @@ import AssessmentDetail from "./pages/AssessmentDetail.tsx";
 import Reports from "./pages/Reports.tsx";
 import SupplierPortal from "./pages/SupplierPortal.tsx";
 import Questionnaire from "./pages/Questionnaire.tsx";
-import { RiskAnalysis, SecurityRequirements, SecureCodeReview, SecurityTesting, Compliance } from "./pages/Modules.tsx";
+import RiskAnalysisModule from "./pages/RiskAnalysisModule.tsx";
+import SecurityRequirementsModule from "./pages/SecurityRequirementsModule.tsx";
+import SecureCodeReviewModule from "./pages/SecureCodeReviewModule.tsx";
+import SecurityTestingModule from "./pages/SecurityTestingModule.tsx";
+import ComplianceModule from "./pages/ComplianceModule.tsx";
 import Invites from "./pages/Invites.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
