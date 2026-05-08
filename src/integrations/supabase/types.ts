@@ -65,6 +65,45 @@ export type Database = {
           },
         ]
       }
+      attachments: {
+        Row: {
+          content_type: string | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          project_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          file_path: string
+          file_size?: number
+          id?: string
+          project_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          project_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       code_review_findings: {
         Row: {
           created_at: string
