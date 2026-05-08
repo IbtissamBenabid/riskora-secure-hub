@@ -11,6 +11,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { ChevronLeft, Send, CheckCircle2, XCircle, AlertTriangle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import type { DecisionType } from "@/types";
+import { AttachmentList } from "@/components/AttachmentList";
 
 const ANSWER_LABEL: Record<string, string> = {
   yes: "Yes — fully implemented",
@@ -185,6 +186,10 @@ export default function AssessmentDetail() {
             <div className="text-xs text-muted-foreground">{supplier?.contactEmail}</div>
             <div className="mt-1 text-xs text-muted-foreground">{supplier?.category}</div>
           </div>
+
+          {project && (
+            <AttachmentList entityType="assessment" entityId={a.id} projectId={project.id} />
+          )}
         </div>
       </div>
     </AppShell>
