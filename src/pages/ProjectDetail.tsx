@@ -48,6 +48,78 @@ export default function ProjectDetail() {
     decision: store.decisions.find(d => d.assessmentId === a.id),
   })), [projectAssessments, store.suppliers, store.riskScores, store.decisions]);
 
+  // Cross-module aggregates scoped to this project
+  const [counts, setCounts] = useState({
+    risks: 0, highRisks: 0, requirements: 0, codeFindings: 0,
+    pentestFindings: 0, openPentest: 0, frameworks: 0,
+    controlsTotal: 0, controlsImplemented: 0,
+  });
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const [
+        { data: risks },
+        { count: reqCount },
+        { data: reviews },
+        { data: pentests },
+        { data: frameworks },
+      ] = await Promise.all([
+        supabase.from("risk_registers").select("id, risk_score").eq("project_id", project.id),
+        supabase.from("security_requirements").select("id", { count: "exact", head: true }).eq("project_id", project.id),
+        supabase.from("code_reviews").select("id").eq("project_id", project.id),
+        supabase.from("pentest_engagements").select("id").eq("project_id", project.id),
+        supabase.from("compliance_frameworks").select("id").eq("project_id", project.id),
+      ]);
+
+      const reviewIds = (reviews ?? []).map((r: any) => r.id);
+      const pentestIds = (pentests ?? []).map((r: any) => r.id);
+      const fwIds = (frameworks ?? []).map((r: any) => r.id);
+
+      const [
+        { count: codeFindingsCount },
+        { data: pf },
+        { data: ctrls },
+      ] = await Promise.all([
+        reviewIds.length
+          ? supabase.from("code_review_findings").select("id", { count: "exact", head: true }).in("review_id", reviewIds)
+          : Promise.resolve({ count: 0 } as any),
+        pentestIds.length
+          ? supabase.from("pentest_findings").select("id, status").in("engagement_id", pentestIds)
+          : Promise.resolve({ data: [] } as any),
+        fwIds.length
+          ? supabase.from("compliance_controls").select("id, status").in("framework_id", fwIds)
+          : Promise.resolve({ data: [] } as any),
+      ]);
+
+      if (!active) return;
+      setCounts({
+        risks: risks?.length ?? 0,
+        highRisks: (risks ?? []).filter((r: any) => (r.risk_score ?? 0) >= 15).length,
+        requirements: reqCount ?? 0,
+        codeFindings: codeFindingsCount ?? 0,
+        pentestFindings: (pf ?? []).length,
+        openPentest: (pf ?? []).filter((x: any) => x.status === "open").length,
+        frameworks: fwIds.length,
+        controlsTotal: (ctrls ?? []).length,
+        controlsImplemented: (ctrls ?? []).filter((c: any) => c.status === "implemented" || c.status === "verified").length,
+      });
+    })();
+    return () => { active = false; };
+  }, [project.id]);
+
+  const compliancePct = counts.controlsTotal
+    ? Math.round((counts.controlsImplemented / counts.controlsTotal) * 100) : 0;
+
+  const moduleCards = [
+    { label: "Risks", value: counts.risks, sub: `${counts.highRisks} high`, to: "/modules/risk-analysis", icon: AlertTriangle },
+    { label: "Requirements", value: counts.requirements, sub: "tracked", to: "/modules/security-requirements", icon: ClipboardList },
+    { label: "Code Findings", value: counts.codeFindings, sub: "across reviews", to: "/modules/secure-code-review", icon: Code2 },
+    { label: "Pentest Findings", value: counts.pentestFindings, sub: `${counts.openPentest} open`, to: "/modules/security-testing", icon: Bug },
+    { label: "Compliance", value: `${compliancePct}%`, sub: `${counts.frameworks} fw`, to: "/modules/compliance", icon: BookCheck },
+    { label: "TPRM", value: projectAssessments.length, sub: `${reportRows.filter(r => r.score).length} scored`, to: "/tprm", icon: ShieldCheck },
+  ];
+
   return (
     <AppShell
       title={project.name}
@@ -65,7 +137,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="mt-6">
+        <TabsContent value="overview" className="mt-6 space-y-6">
           <div className="grid gap-4 lg:grid-cols-3">
             <div className="panel p-6 lg:col-span-2">
               <div className="stat-label">Description</div>
@@ -81,6 +153,36 @@ export default function ProjectDetail() {
               <div className="mt-2 text-base font-semibold">{org?.name}</div>
               <p className="mt-1 text-xs text-muted-foreground">All assessments and suppliers in this project belong to this client.</p>
             </div>
+          </div>
+
+          <div className="panel">
+            <div className="border-b border-border px-6 py-4">
+              <h3 className="text-sm font-semibold">Security Posture</h3>
+              <p className="text-xs text-muted-foreground">Activity across every module for this project</p>
+            </div>
+            <div className="grid grid-cols-2 divide-border md:grid-cols-3 md:divide-x lg:grid-cols-6">
+              {moduleCards.map(({ label, value, sub, to, icon: Icon }) => (
+                <Link key={label} to={to} className="group flex flex-col gap-1 px-5 py-4 hover:bg-surface-muted">
+                  <div className="flex items-center justify-between">
+                    <span className="stat-label">{label}</span>
+                    <Icon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-accent" />
+                  </div>
+                  <div className="font-mono text-2xl font-bold">{value}</div>
+                  <div className="text-[11px] text-muted-foreground">{sub}</div>
+                </Link>
+              ))}
+            </div>
+            {counts.controlsTotal > 0 && (
+              <div className="border-t border-border px-6 py-4">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium">Compliance readiness</span>
+                  <span className="font-mono text-muted-foreground">{compliancePct}%</span>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full rounded-full bg-accent" style={{ width: `${compliancePct}%` }} />
+                </div>
+              </div>
+            )}
           </div>
         </TabsContent>
 
